@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "929956541628",
+    "project_id": "live-match-update",
+    "storage_bucket": "live-match-update.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929956541628:android:db3705c6bc97de1d4b0cb9",
+        "android_client_info": {
+          "package_name": "com.example.live_match"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyhCkUuTlyIXnH9Ml2HnZJaS0o3grzdUo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
