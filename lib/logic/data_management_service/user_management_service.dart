@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_match/data/data_model/user_model.dart';
 import 'package:live_match/logic/locator.dart';
@@ -21,14 +22,11 @@ class UserManagementService {
       if (user != null) {
         if (userData.value != null) {
           if (user.uid != userData.value!.uid) {
-            await Locator.userDatabaseSerice.deleteUserFromLocal();
-            await Locator.companyDatabaseService.deleteCompanyInLocal();
+            await Locator.userDatabaseService.deleteUserFromLocal();
           }
         }
         if (Locator.hiveService.userBox!.isEmpty) {
-          await Locator.userDatabaseSerice.getUserData(user);
-          await Locator.companyDatabaseService.getCompanyData();
-          await Locator.employeeDatabaseService.getEmployeeData();
+          await Locator.userDatabaseService.getUserData(user);
           await Locator.startupService.setupApplicationData();
         }
       } else {}

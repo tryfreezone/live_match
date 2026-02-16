@@ -1,9 +1,12 @@
 
 
+import 'package:get_it/get_it.dart';
+import 'package:live_match/data/database_service/user_database_service.dart';
 import 'package:live_match/logic/app_management_servive/firestore_service.dart';
 import 'package:live_match/logic/app_management_servive/hive_service.dart';
 import 'package:live_match/logic/app_management_servive/navigation_service.dart';
 import 'package:live_match/logic/app_management_servive/startup_service.dart';
+import 'package:live_match/logic/data_management_service/user_management_service.dart';
 
 class Locator {
   static void setup() {
@@ -14,7 +17,7 @@ class Locator {
     GetIt.instance.registerLazySingleton(() => NavigationService());
 
     //databaseServices
-    GetIt.instance.registerLazySingleton(() => UserDatabaseSerice());
+    GetIt.instance.registerLazySingleton(() => UserDatabaseService());
    
 
     //DataManagementServices
@@ -30,8 +33,8 @@ class Locator {
       GetIt.I<NavigationService>();
 
   //databaseServices
-  static UserDatabaseSerice get userDatabaseSerice =>
-      GetIt.I<UserDatabaseSerice>();
+  static UserDatabaseService get userDatabaseService =>
+      GetIt.I<UserDatabaseService>();
 
 
   //DataManagementServices

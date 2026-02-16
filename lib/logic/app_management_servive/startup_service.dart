@@ -1,4 +1,3 @@
-
 import 'package:live_match/logic/locator.dart';
 
 class StartupService {
@@ -12,7 +11,7 @@ class StartupService {
 
   setupApplicationData() async {
     if (Locator.hiveService.userBox!.isNotEmpty) {
-      var userModel = await Locator.userDatabaseSerice.readUserFromLocal();
+      var userModel = await Locator.userDatabaseService.readUserFromLocal();
       Locator.userManagementService.userData.value = userModel!;
        //  await syncProductData();
 

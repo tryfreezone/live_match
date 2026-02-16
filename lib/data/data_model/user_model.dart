@@ -23,6 +23,10 @@ class UserModel {
   String? photoURL;
   @HiveField(8)
   bool? passwordVerified;
+  @HiveField(9)
+  String? uid;
+  @HiveField(10)
+  String? userType;
 
   UserModel({
     this.displayName,
@@ -35,6 +39,8 @@ class UserModel {
     this.address,
     this.photoURL,
     this.passwordVerified,
+    this.uid, 
+    this.userType,
   });
 
   factory UserModel.fromJson({
@@ -71,4 +77,4 @@ class UserModel {
       'passwordVerified': passwordVerified,
     };
   }
-}
+} 
