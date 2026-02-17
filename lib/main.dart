@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
     bool brightness =
         MediaQuery.of(context).platformBrightness == Brightness.light;
     return MaterialApp(
-        title: 'Match Meter',
+        title: 'Match Meter2.o',
         theme: ThemeData.from(
           colorScheme: brightness == Brightness.light
                ? const ColorScheme.light(
