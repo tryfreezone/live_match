@@ -24,12 +24,15 @@ class UserDatabaseService {
   }
    Future<UserModel> createNewUser(User user) async {
     UserModel userModel = UserModel(
-        uid: user.uid,
-        name: user.displayName ?? "",
-        email: user.email ?? "",
-        userType: "admin",
-        
-       );
+      uid: user.uid,
+      displayName: user.displayName ?? "",
+      name: user.displayName ?? "",
+      email: user.email ?? "",
+      photoURL: user.photoURL ?? "",
+      passwordVerified: user.emailVerified,
+      userType: "admin",
+      profileComplete: false,
+    );
         
 
     var payload = userModel.toJson();
@@ -48,7 +51,8 @@ class UserDatabaseService {
     DocumentReference documentReference =
         FirebaseFirestore.instance.collection('users').doc(user.uid);
     DocumentSnapshot documentSnapshot = await documentReference.get();
-    Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic> ?? {};
+    Map<String, dynamic> data =
+      (documentSnapshot.data() as Map<String, dynamic>?) ?? {};
     UserModel userModel = UserModel.fromJson(data: data, user: user);
     return userModel;
   }
@@ -67,6 +71,18 @@ class UserDatabaseService {
 
   Future<void> updateUserInLocal(UserModel userModel) async {
     await Locator.hiveService.userBox?.put(userModel.uid, userModel);
+  }
+
+  Future<void> updateUserInRemote(UserModel userModel) async {
+    if (userModel.uid == null) return;
+    await Locator.firestoreService.userColRef
+        .doc(userModel.uid)
+        .set(userModel.toJson(), SetOptions(merge: true));
+  }
+
+  Future<void> updateUser(UserModel userModel) async {
+    await updateUserInRemote(userModel);
+    await updateUserInLocal(userModel);
   }
 
   deleteUserFromLocal() async {

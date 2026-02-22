@@ -1,22 +1,25 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_match/logic/locator.dart';
-import 'sign_up_page.dart';
+import 'screen_selector.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -25,9 +28,41 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    await Locator.userManagementService.signInWithEmailAndPassword(
-      _emailController.text.trim(),
-      _passwordController.text,
+    await Locator.userManagementService.signUpWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      name: _nameController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const ScreenSelector()),
+      (route) => false,
+    );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    await Locator.userManagementService.signInWithGoogle();
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (!mounted || user == null) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const ScreenSelector()),
+      (route) => false,
+    );
+  }
+
+  Future<void> _signInWithFacebook() async {
+    await Locator.userManagementService.signInWithFacebook();
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (!mounted || user == null) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const ScreenSelector()),
+      (route) => false,
     );
   }
 
@@ -54,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
                           horizontal: 48,
                           vertical: 32,
                         ),
-                        child: _buildLoginCard(theme),
+                        child: _buildSignUpCard(theme),
                       ),
                     ),
                   ),
@@ -69,13 +104,13 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const SizedBox(height: 16),
                   SizedBox(
-                    height: constraints.maxHeight * 0.3,
+                    height: constraints.maxHeight * 0.28,
                     child: _buildBrandPanel(compact: true),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Expanded(
                     child: Center(
-                      child: _buildLoginCard(theme),
+                      child: _buildSignUpCard(theme),
                     ),
                   ),
                 ],
@@ -151,13 +186,13 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
           if (!compact) const SizedBox(height: 32),
-          // Show the large hero image only on wide screens.
+          // Large hero image only on wider layouts; hidden on mobile.
           if (!compact)
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Image.asset(
-                  'assets/images/loginpage.png',
+                  'assets/images/logo.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -167,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoginCard(ThemeData theme) {
+  Widget _buildSignUpCard(ThemeData theme) {
     final textTheme = theme.textTheme;
 
     return ConstrainedBox(
@@ -192,13 +227,24 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Login',
+                'Sign Up',
                 style: textTheme.headlineSmall?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 24),
+              _buildTextField(
+                controller: _nameController,
+                hint: 'Full Name',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
               _buildTextField(
                 controller: _emailController,
                 hint: 'Your Email Address',
@@ -230,23 +276,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
+                    return 'Please enter a password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Forgot Password?',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               ValueListenableBuilder<bool>(
                 valueListenable:
                     Locator.navigationService.isLoadingNotifier,
@@ -273,7 +311,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             )
                           : const Text(
-                              'Login',
+                              'Create Account',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -283,22 +321,7 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 },
               ),
-              const SizedBox(height: 12),
-              ValueListenableBuilder<bool>(
-                valueListenable:
-                    Locator.userManagementService.invalidUser,
-                builder: (context, invalid, _) {
-                  if (!invalid) return const SizedBox.shrink();
-                  return const Padding(
-                    padding: EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      'Invalid email or password',
-                      style: TextStyle(color: Colors.redAccent),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Row(
                 children: const [
                   Expanded(
@@ -323,32 +346,24 @@ class _LoginPageState extends State<LoginPage> {
                   _buildSocialButton(
                     icon: Icons.facebook,
                     color: const Color(0xFF1877F2),
-                    onPressed: () {
-                      Locator.userManagementService.signInWithFacebook();
-                    },
+                    onPressed: _signInWithFacebook,
                   ),
                   const SizedBox(width: 16),
                   _buildSocialButton(
                     icon: Icons.g_mobiledata,
                     color: const Color(0xFFDB4437),
-                    onPressed: () {
-                      Locator.userManagementService.signInWithGoogle();
-                    },
+                    onPressed: _signInWithGoogle,
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Center(
                 child: TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SignUpPage(),
-                      ),
-                    );
+                    Navigator.of(context).pop();
                   },
                   child: const Text(
-                    "Don't have an Account? Sign Up",
+                    'Already have an account? Login',
                     style: TextStyle(color: Colors.white70),
                   ),
                 ),

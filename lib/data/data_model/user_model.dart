@@ -27,6 +27,14 @@ class UserModel {
   String? uid;
   @HiveField(10)
   String? userType;
+  @HiveField(11)
+  String? age;
+  @HiveField(12)
+  String? location;
+  @HiveField(13)
+  String? favoriteSport;
+  @HiveField(14)
+  bool? profileComplete;
 
   UserModel({
     this.displayName,
@@ -41,6 +49,10 @@ class UserModel {
     this.passwordVerified,
     this.uid, 
     this.userType,
+    this.age,
+    this.location,
+    this.favoriteSport,
+    this.profileComplete,
   });
 
   factory UserModel.fromJson({
@@ -58,6 +70,12 @@ class UserModel {
         address: data['address'] ?? '',
         photoURL: data['photoURL'] ?? '',
         passwordVerified: data['passwordVerified'] ?? false,
+        uid: data['uid'] ?? user.uid,
+        userType: data['userType'] ?? '',
+        age: data['age']?.toString(),
+        location: data['location'] ?? '',
+        favoriteSport: data['favoriteSport'] ?? '',
+        profileComplete: data['profileComplete'] ?? false,
       );
     } catch (error) {
       throw FormatException('Invalid JSON: $data');
@@ -75,6 +93,12 @@ class UserModel {
       'address': address,
       'photoURL': photoURL,
       'passwordVerified': passwordVerified,
+      'uid': uid,
+      'userType': userType,
+      'age': age,
+      'location': location,
+      'favoriteSport': favoriteSport,
+      'profileComplete': profileComplete,
     };
   }
 } 

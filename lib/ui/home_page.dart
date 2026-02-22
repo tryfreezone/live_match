@@ -73,7 +73,7 @@ class HomePage extends StatelessWidget {
             _ProClubContent(),
           ],
         ),
-        bottomNavigationBar: _buildBottomArea(context),
+        // bottomNavigationBar: _buildBottomArea(context),
       ),
     );
   }
